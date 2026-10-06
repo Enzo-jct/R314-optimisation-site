@@ -67,10 +67,14 @@
     var list = document.querySelector('#motscles');
     if (!list) return;
 
-    list.innerHTML = '';
+    var frag = document.createDocumentFragment();
     for (var i = 0; i < TAGS.length; i++) {
-      list.innerHTML += '<option value="' + TAGS[i] + '"></option>';
+      var option = document.createElement('option');
+      option.value = TAGS[i];
+      frag.appendChild(option);
     }
+    list.innerHTML = '';
+    list.appendChild(frag);
   }
 
   function buildActivityCalendar() {
