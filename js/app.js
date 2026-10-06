@@ -143,29 +143,39 @@
     }
   }
 
-  function revealCards() {
+  function equalizeCards() {
     var cards = document.querySelectorAll('.card');
-
+    var tallest = 0;
     for (var i = 0; i < cards.length; i++) {
-      var rect = cards[i].getBoundingClientRect();
-
-      var tallest = 0;
-      var all = document.querySelectorAll('.card');
-      for (var j = 0; j < all.length; j++) {
-        if (all[j].offsetHeight > tallest) {
-          tallest = all[j].offsetHeight;
-        }
-      }
-      cards[i].style.minHeight = tallest + 'px';
-
-      if (rect.top < window.innerHeight - 40) {
-        cards[i].classList.add('visible');
-        cards[i].style.transform = 'translateY(0px)';
-      } else {
-        cards[i].style.transform = 'translateY(24px)';
+      if (cards[i].offsetHeight > tallest) {
+        tallest = cards[i].offsetHeight;
       }
     }
+    for (var j = 0; j < cards.length; j++) {
+      cards[j].style.minHeight = tallest + 'px';
+    }
+  }
 
+  function observeCards() {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var rect = entry.boundingClientRect;
+        if (!rect.height) return;
+        if (entry.isIntersecting || rect.top < 0) {
+          entry.target.classList.add('visible');
+          entry.target.style.transform = 'translateY(0px)';
+        } else {
+          entry.target.style.transform = 'translateY(24px)';
+        }
+      });
+    }, { rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.card').forEach(function (card) {
+      observer.observe(card);
+    });
+  }
+
+  function fadeCalendar() {
     var jours = document.querySelectorAll('.cal-day');
     for (var k = 0; k < jours.length; k++) {
       var box = jours[k].getBoundingClientRect();
@@ -186,16 +196,22 @@
     });
   }
 
+  function refreshLayout() {
+    equalizeCards();
+    fadeCalendar();
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     buildKeywordIndex();
     buildActivityCalendar();
     watchImages();
-    revealCards();
+    refreshLayout();
+    observeCards();
     var champ = document.querySelector('#q');
     if (champ) champ.addEventListener('input', filterGallery);
   });
 
-  window.addEventListener('scroll', revealCards);
-  window.addEventListener('resize', revealCards);
-  window.addEventListener('load', revealCards);
+  window.addEventListener('scroll', fadeCalendar);
+  window.addEventListener('resize', refreshLayout);
+  window.addEventListener('load', refreshLayout);
 })();
