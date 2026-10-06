@@ -13,22 +13,13 @@
 
     <link rel="stylesheet" href="css/styles.css" />
 
-    <script src="js/legacy/polyfills.js"></script>
     <script src="js/vendor/ui-kit.min.js"></script>
     <script src="js/app.js"></script>
     <script src="js/analytics.js" defer></script>
 
-    <!-- ===== Infrastructure du TP : hors exercice =====================
-         Le bouton « Consignes » et sa fenêtre ne font pas partie du site à
-         optimiser. Inutile de les analyser, les optimiser ou les supprimer.
-         Volontairement en ligne : aucune requête supplémentaire, et rien ne
-         casse quand vous réécrivez css/styles.css ou js/app.js.
-         ================================================================ -->
     <style>
       .tp-link{border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 12px}
       .tp-link:hover{background:rgba(255,255,255,.08)}
-      /* Cette entrée de menu supplémentaire fait déborder la barre sur petit
-         écran : on autorise le retour à la ligne. */
       @media (max-width:640px){
         .menu{flex-wrap:wrap;justify-content:flex-end;gap:8px 14px}
       }
@@ -167,7 +158,6 @@
       </div>
     </div>
 
-    <!-- ===== Infrastructure du TP : hors exercice ===================== -->
     <dialog id="tp-modal" aria-labelledby="tp-modal-titre">
       <div class="tp-modal-bar">
         <span id="tp-modal-titre">Consignes du TP</span>
@@ -180,11 +170,6 @@
     </dialog>
 
     <script>
-      /* Ouvre les consignes en fenêtre modale. Sans JavaScript, ou si
-         <dialog> n'est pas supporté, les liens naviguent normalement vers
-         consignes.html : le contenu reste accessible dans tous les cas.
-         L'iframe n'est chargée qu'à la première ouverture, pour ne rien
-         ajouter au chargement de la page mesurée. */
       (function () {
         var modal = document.getElementById('tp-modal');
         var liens = document.querySelectorAll('.js-consignes');
@@ -203,21 +188,17 @@
         modal.querySelector('[data-tp-close]').addEventListener('click', function () {
           modal.close();
         });
-        // Échap ne remonte pas d'une iframe vers le <dialog> parent : on
-        // écoute donc aussi dans le document embarqué (même origine).
         frame.addEventListener('load', function () {
           try {
             frame.contentDocument.addEventListener('keydown', function (e) {
               if (e.key === 'Escape') modal.close();
             });
-          } catch (err) { /* origine différente : la touche Échap n'agira pas */ }
+          } catch (err) {}
         });
-        // Clic sur le fond sombre : la cible est alors le <dialog> lui-même.
         modal.addEventListener('click', function (e) {
           if (e.target === modal) modal.close();
         });
       })();
-      /* ================================================================ */
 
       if (new URLSearchParams(location.search).has('perf')) {
         var s = document.createElement('script');
