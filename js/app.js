@@ -175,12 +175,20 @@
     });
   }
 
+  var lastOpacities = '';
+
   function fadeCalendar() {
     var jours = document.querySelectorAll('.cal-day');
+    var opacities = [];
+    for (var r = 0; r < 7 && r < jours.length; r++) {
+      var d = Math.abs(jours[r].getBoundingClientRect().top - window.innerHeight / 2);
+      opacities.push(Math.max(0.15, 1 - d / window.innerHeight));
+    }
+    if (opacities.join() === lastOpacities) return;
+    lastOpacities = opacities.join();
+
     for (var k = 0; k < jours.length; k++) {
-      var box = jours[k].getBoundingClientRect();
-      var d = Math.abs(box.top - window.innerHeight / 2);
-      jours[k].style.opacity = Math.max(0.15, 1 - d / window.innerHeight);
+      jours[k].style.opacity = opacities[k % 7];
     }
   }
 
@@ -211,7 +219,15 @@
     if (champ) champ.addEventListener('input', filterGallery);
   });
 
-  window.addEventListener('scroll', fadeCalendar);
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      fadeCalendar();
+      ticking = false;
+    });
+  }, { passive: true });
   window.addEventListener('resize', refreshLayout);
   window.addEventListener('load', refreshLayout);
 })();
