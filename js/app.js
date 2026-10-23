@@ -85,6 +85,14 @@
                 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
     var fin = new Date(Date.UTC(2026, 8, 30));
     var frag = document.createDocumentFragment();
+    var rows = [];
+
+    for (var r = 0; r < 7; r++) {
+      var row = document.createElement('div');
+      row.className = 'cal-row';
+      rows.push(row);
+      frag.appendChild(row);
+    }
 
     for (var i = 370; i >= 0; i--) {
       var jour = new Date(fin.getTime() - i * 86400000);
@@ -96,7 +104,7 @@
         ? 'Aucune prise de vue le ' + jour.getUTCDate() + ' ' + MOIS[jour.getUTCMonth()]
         : n + ' prise' + (n > 1 ? 's' : '') + ' de vue le ' + jour.getUTCDate() +
           ' ' + MOIS[jour.getUTCMonth()];
-      frag.appendChild(cell);
+      rows[(370 - i) % 7].appendChild(cell);
     }
     host.appendChild(frag);
   }
@@ -175,20 +183,15 @@
     });
   }
 
-  var lastOpacities = '';
-
   function fadeCalendar() {
-    var jours = document.querySelectorAll('.cal-day');
+    var rows = document.querySelectorAll('.cal-row');
     var opacities = [];
-    for (var r = 0; r < 7 && r < jours.length; r++) {
-      var d = Math.abs(jours[r].getBoundingClientRect().top - window.innerHeight / 2);
+    for (var i = 0; i < rows.length; i++) {
+      var d = Math.abs(rows[i].getBoundingClientRect().top - window.innerHeight / 2);
       opacities.push(Math.max(0.15, 1 - d / window.innerHeight));
     }
-    if (opacities.join() === lastOpacities) return;
-    lastOpacities = opacities.join();
-
-    for (var k = 0; k < jours.length; k++) {
-      jours[k].style.opacity = opacities[k % 7];
+    for (var j = 0; j < rows.length; j++) {
+      rows[j].style.opacity = opacities[j];
     }
   }
 
